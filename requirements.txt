@@ -1,4 +1,6 @@
 fastapi==0.115.12
+torch==2.5.1
+torchaudio==2.5.1
 uvicorn==0.34.2
 numpy==1.26.4
 soundfile==0.13.1

@@ -17,9 +17,17 @@ $pythonPath = Join-Path (Get-Location) '.venv\Scripts\python.exe'
 Check-Exit
 & $pythonPath -m pip install --upgrade pip
 Check-Exit
-& $pythonPath -m pip install torch==2.5.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu121
+if (Get-Command uv -ErrorAction SilentlyContinue) {
+    uv pip install --python $pythonPath torch==2.5.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu121
+} else {
+    & $pythonPath -m pip install torch==2.5.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu121
+}
 Check-Exit
-& $pythonPath -m pip install -r requirements.txt
+if (Get-Command uv -ErrorAction SilentlyContinue) {
+    uv pip install --python $pythonPath -r requirements.txt
+} else {
+    & $pythonPath -m pip install -r requirements.txt
+}
 Check-Exit
 & $pythonPath -m pip check
 Check-Exit

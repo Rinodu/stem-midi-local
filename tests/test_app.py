@@ -33,6 +33,9 @@ def wait_job(module, job_id):
 def test_pairing_and_cors(service):
     module, client, headers = service
     assert client.get('/api/jobs').status_code == 401
+    unauthorized = client.get('/api/jobs', headers={'Origin':'https://rinodu.github.io'})
+    assert unauthorized.status_code == 401
+    assert unauthorized.headers['access-control-allow-origin'] == 'https://rinodu.github.io'
     assert client.get('/api/jobs', headers={**headers, 'Origin': 'https://evil.example'}).status_code == 403
     response = client.options('/api/jobs', headers={'Origin': 'https://rinodu.github.io',
         'Access-Control-Request-Method': 'POST', 'Access-Control-Request-Headers': 'authorization,content-type',

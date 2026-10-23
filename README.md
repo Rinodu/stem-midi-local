@@ -16,6 +16,10 @@ Upload audio → uji cuplikan → pisahkan stem → dengarkan/download WAV → p
 
 FFmpeg disediakan oleh `imageio-ffmpeg`, tidak perlu instalasi sistem terpisah. File diproses lokal, tanpa API key dan tanpa kredit inference. Internet diperlukan saat instalasi dan unduhan bobot Demucs pertama kali.
 
+### Bila drive C sempit
+
+Siapkan **minimal 12 GB kosong** pada drive runtime, ditambah ruang untuk hasil audio. Dari terminal pada folder proyek, jalankan `Install.bat -RuntimeRoot E:\StemMidiRuntime` (ganti drive/folder sesuai PC). Environment, cache instalasi dan bobot Demucs berada pada drive itu; `Start.bat` membaca lokasi yang tersimpan otomatis. Kode dan hasil audio tetap dalam folder proyek. Folder runtime harus tetap tersedia saat aplikasi dipakai. Installer tidak membersihkan file pengguna atau mengubah Python global.
+
 ### Bila koneksi Pages → PC diblokir
 
 Gunakan browser desktop terbaru dan izinkan akses jaringan lokal untuk situs. Beberapa browser/kebijakan kantor membatasi permintaan HTTPS ke HTTP loopback; header CORS/PNA tidak dapat memaksa browser memberi izin. Launcher juga menampilkan tautan **versi lokal** dengan UI yang sama. Jangan mematikan keamanan browser, membuka port router, atau mengekspos backend ke internet. GitHub Pages dan backend harus dibuka pada **PC yang sama**; `127.0.0.1` dari HP menunjuk HP itu sendiri.

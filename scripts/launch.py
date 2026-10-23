@@ -10,6 +10,7 @@ import webbrowser
 
 ROOT = Path(__file__).resolve().parents[1]
 os.chdir(ROOT)
+os.environ.setdefault('TORCH_HOME', str(Path(sys.prefix).parent / '.local' / 'models'))
 DATA = ROOT / '.local'
 DATA.mkdir(exist_ok=True)
 token_file = DATA / 'token.txt'

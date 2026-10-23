@@ -116,7 +116,10 @@ async def private_api(request: Request, call_next):
         if request.method != "OPTIONS":
             supplied = request.headers.get("authorization", "")
             if not hmac.compare_digest(supplied, "Bearer " + TOKEN):
-                return JSONResponse({"detail": "Token pairing salah atau kosong"}, status_code=401)
+                headers = {"Cache-Control": "no-store"}
+                if origin in ORIGINS:
+                    headers.update({"Access-Control-Allow-Origin": origin, "Vary": "Origin"})
+                return JSONResponse({"detail": "Token pairing salah atau kosong"}, status_code=401, headers=headers)
     response = await call_next(request)
     response.headers["Cache-Control"] = "no-store"
     if request.method == "OPTIONS" and request.headers.get("origin") in ORIGINS:

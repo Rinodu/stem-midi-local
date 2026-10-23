@@ -65,7 +65,7 @@ def transcribe(folder, stem, source, engine, device, onset, minimum_ms):
     rms, peak = audio_levels(folder / source)
     reference_rms, _ = audio_levels(folder / "input.wav")
     # Only suppress extremely quiet residuals relative to the mix, not quiet recordings.
-    if rms == 0 or (peak < .001 and rms < .0001 and rms < reference_rms * .003):
+    if rms == 0 or (peak < .0031623 and rms < .0001 and rms < reference_rms * .003):
         import pretty_midi
         pretty_midi.PrettyMIDI().write(str(pending))
         pending.with_suffix(".json").write_text("[]", encoding="utf-8")

@@ -136,7 +136,9 @@ def test_near_silent_residual_does_not_create_false_notes(tmp_path, monkeypatch)
     from backend import pipeline
     signal = np.sin(np.arange(44100) * 2 * np.pi * 440 / 44100).astype('float32')
     sf.write(tmp_path / 'input.wav', signal * .1, 44100, subtype='FLOAT')
-    sf.write(tmp_path / 'guitar.wav', signal * .00005, 44100, subtype='FLOAT')
+    residual = signal * .00005
+    residual[100] = .002  # An isolated bleed transient must not bypass the RMS gate.
+    sf.write(tmp_path / 'guitar.wav', residual, 44100, subtype='FLOAT')
     result = pipeline.transcribe(tmp_path, 'guitar', 'guitar.wav', 'basic-pitch', 'cpu', .5, 100)
     assert result['notes'] == 0 and result['warning']
     assert pretty_midi.PrettyMIDI(str(tmp_path / result['file'])).instruments == []

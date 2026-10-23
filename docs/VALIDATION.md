@@ -1,5 +1,9 @@
 # Validation — 23 October 2026
 
+## Follow-up: real Bulbel excerpt
+
+User-supplied MP3 tested on seconds 0–5 with six-stem, two-shift CUDA separation. All six WAVs were exactly 5 seconds; piano Transkun MIDI contained 12 parseable notes within the clip. The other stems had RMS approximately -89 to -92 dBFS, over 60 dB below piano, but Basic Pitch initially emitted 13–24 notes from this residual bleed. A conservative absolute-and-relative near-silence gate now exports empty MIDI with a visible warning for such residuals; original WAV stems are retained. Regression tests check that equally quiet whole recordings still reach the model. Current application suite: **6 passed**. This does not establish note-for-note musical accuracy. No user audio is committed to this repository.
+
 ## Environment actually tested
 
 - Windows x64, Python 3.10.21, PyTorch/Torchaudio 2.5.1+cu121.

@@ -127,3 +127,24 @@ def test_restart_marks_interrupted(service):
     module.save_job({'id':job_id, 'status':'processing', 'stems':{}, 'midi':{}})
     with TestClient(module.app):
         assert module.read_job(job_id)['status'] == 'error'
+
+
+def test_near_silent_residual_does_not_create_false_notes(tmp_path, monkeypatch):
+    import numpy as np
+    import soundfile as sf
+    import pretty_midi
+    from backend import pipeline
+    signal = np.sin(np.arange(44100) * 2 * np.pi * 440 / 44100).astype('float32')
+    sf.write(tmp_path / 'input.wav', signal * .1, 44100, subtype='FLOAT')
+    sf.write(tmp_path / 'guitar.wav', signal * .00005, 44100, subtype='FLOAT')
+    result = pipeline.transcribe(tmp_path, 'guitar', 'guitar.wav', 'basic-pitch', 'cpu', .5, 100)
+    assert result['notes'] == 0 and result['warning']
+    assert pretty_midi.PrettyMIDI(str(tmp_path / result['file'])).instruments == []
+    assert json.loads((tmp_path / 'midi/guitar.json').read_text()) == []
+    # An equally quiet recording must still reach the model, not be suppressed.
+    sf.write(tmp_path / 'input.wav', signal * .00005, 44100, subtype='FLOAT')
+    def called(*args, **kwargs):
+        raise RuntimeError('model reached')
+    monkeypatch.setattr(pipeline, 'run', called)
+    with pytest.raises(RuntimeError, match='model reached'):
+        pipeline.transcribe(tmp_path, 'guitar', 'guitar.wav', 'basic-pitch', 'cpu', .5, 100)

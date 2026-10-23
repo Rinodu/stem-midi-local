@@ -85,6 +85,7 @@ function renderJob(job) {
     }
     if (job.midi[stem]) {
       const item = job.midi[stem];
+      if (item.warning) { const warning = document.createElement('p'); warning.className = 'muted'; warning.textContent = item.warning; row.append(warning); }
       row.append(button(`↓ MIDI · ${item.notes} not`, () => download(`jobs/${job.id}/files/${item.file}`, `${stem}.mid`)),
         button('Piano roll', () => showRoll(job, stem, item.file)),
         button('↓ CSV not', () => download(`jobs/${job.id}/files/${item.file.replace(/\.mid$/, '.csv')}`, `${stem}.csv`)));

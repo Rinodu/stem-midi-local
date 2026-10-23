@@ -6,10 +6,20 @@ import subprocess
 import sys
 
 import imageio_ffmpeg
+import numpy as np
 import soundfile as sf
 
 MODELS = {"six": "htdemucs_6s", "four": "htdemucs_ft"}
 PITCHED = {"piano": 0, "guitar": 24, "bass": 33, "vocals": 53, "other": 0}
+
+
+def audio_levels(path):
+    energy, count, peak = 0.0, 0, 0.0
+    for block in sf.blocks(path, blocksize=44100, dtype="float32", always_2d=True):
+        energy += float(np.square(block, dtype=np.float64).sum())
+        count += block.size
+        peak = max(peak, float(np.max(np.abs(block))))
+    return (energy / max(1, count)) ** .5, peak
 
 
 def run(command, folder, timeout=14400):
@@ -51,8 +61,21 @@ def transcribe(folder, stem, source, engine, device, onset, minimum_ms):
     midi_dir = folder / "midi"
     midi_dir.mkdir(exist_ok=True)
     output = midi_dir / f"{stem}.mid"
-    # Write to temporary files first so a failed retry keeps the previous MIDI.
     pending = midi_dir / f"{stem}.pending.mid"
+    rms, peak = audio_levels(folder / source)
+    reference_rms, _ = audio_levels(folder / "input.wav")
+    # Only suppress extremely quiet residuals relative to the mix, not quiet recordings.
+    if rms == 0 or (peak < .001 and rms < .0001 and rms < reference_rms * .003):
+        import pretty_midi
+        pretty_midi.PrettyMIDI().write(str(pending))
+        pending.with_suffix(".json").write_text("[]", encoding="utf-8")
+        pending.with_suffix(".csv").write_text("start,end,pitch,velocity\n", encoding="utf-8")
+        for suffix in (".mid", ".json", ".csv"):
+            pending.with_suffix(suffix).replace(output.with_suffix(suffix))
+        return {"file": output.relative_to(folder).as_posix(), "notes": 0,
+                "engine": engine, "onset": onset, "minimum_ms": minimum_ms,
+                "warning": "Stem nyaris senyap dibanding campuran. MIDI dikosongkan untuk menghindari not dari kebocoran/noise; ini bukan bukti instrumen tidak ada."}
+    # Write to temporary files first so a failed retry keeps the previous MIDI.
     run([sys.executable, "-m", "backend.transcribe", str(folder / source), str(pending),
          "--engine", engine, "--device", device, "--onset", str(onset),
          "--minimum-ms", str(minimum_ms), "--program", str(PITCHED[stem])], folder)

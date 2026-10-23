@@ -83,6 +83,12 @@ def test_jobs_download_retry_and_archive(service, monkeypatch):
     assert client.get(f'/api/jobs/{job_id}/files/piano.wav', headers=headers).content[:4] == b'RIFF'
     assert client.get(f'/api/jobs/{job_id}/files/job.json', headers=headers).status_code == 404
     assert client.get(f'/api/jobs/{job_id}/files/..%2Ftoken.txt', headers=headers).status_code == 404
+    ticket = client.post(f'/api/jobs/{job_id}/download?asset=piano.wav', headers=headers)
+    assert ticket.status_code == 200
+    assert client.get(ticket.json()['url']).content[:4] == b'RIFF'
+    assert client.get(ticket.json()['url']).status_code == 404
+    assert client.post(f'/api/jobs/{job_id}/download?asset=source.wav', headers=headers).status_code == 404
+    assert client.post(f'/api/jobs/{job_id}/download?asset=piano.wav').status_code == 401
     assert client.post(f'/api/jobs/{job_id}/midi', json={'stem':'drums'}, headers=headers).status_code == 422
     result = client.post(f'/api/jobs/{job_id}/midi', json={'stem':'piano','engine':'transkun'}, headers=headers)
     assert result.status_code == 202

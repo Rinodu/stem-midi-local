@@ -46,8 +46,8 @@ def main():
         instrument.program = args.program
         instrument.notes = [n for n in instrument.notes if (n.end - n.start) * 1000 >= args.minimum_ms]
         for note in instrument.notes:
-            rows.append({"start": round(note.start, 5), "end": round(note.end, 5),
-                         "pitch": note.pitch, "velocity": note.velocity})
+            rows.append({"start": round(float(note.start), 5), "end": round(float(note.end), 5),
+                         "pitch": int(note.pitch), "velocity": int(note.velocity)})
     rows.sort(key=lambda n: (n["start"], n["pitch"]))
     midi.write(str(args.output))
     args.output.with_suffix(".json").write_text(json.dumps(rows), encoding="utf-8")

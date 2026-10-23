@@ -18,7 +18,7 @@ FFmpeg disediakan oleh `imageio-ffmpeg`, tidak perlu instalasi sistem terpisah. 
 
 ### Bila drive C sempit
 
-Siapkan **minimal 12 GB kosong** pada drive runtime, ditambah ruang untuk hasil audio. Dari terminal pada folder proyek, jalankan `Install.bat -RuntimeRoot E:\StemMidiRuntime` (ganti drive/folder sesuai PC). Environment, cache instalasi dan bobot Demucs berada pada drive itu; `Start.bat` membaca lokasi yang tersimpan otomatis. Kode dan hasil audio tetap dalam folder proyek. Folder runtime harus tetap tersedia saat aplikasi dipakai. Installer tidak membersihkan file pengguna atau mengubah Python global.
+Siapkan **minimal 12 GB kosong** pada drive runtime, ditambah ruang untuk hasil audio. Dari PowerShell pada folder proyek, jalankan `.\Install.bat -RuntimeRoot E:\StemMidiRuntime` (ganti drive/folder sesuai PC). Environment, cache instalasi dan bobot Demucs berada pada drive itu; `Start.bat` membaca lokasi yang tersimpan otomatis. Kode dan hasil audio tetap dalam folder proyek. Folder runtime harus tetap tersedia saat aplikasi dipakai. Installer tidak membersihkan file pengguna atau mengubah Python global.
 
 ### Bila koneksi Pages → PC diblokir
 
@@ -65,7 +65,7 @@ Untuk menilai akurasi musik: gunakan rekaman instrumen terpisah yang punya MIDI 
 
 ## Keamanan lokal
 
-Backend hanya bind ke loopback. API membutuhkan bearer token, origin diizinkan terbatas dan nama file unduhan memakai allowlist hasil job. CORS bukan autentikasi; token tetap wajib. Token hanya ditampilkan lokal dan tidak boleh dibagikan atau dimasukkan commit. Audio tidak dikirim ke inference cloud. Log GitHub Pages tidak menerima audio, tetapi GitHub tetap melayani kunjungan website seperti biasa. Model Torch hanya dimuat dari paket/registry upstream; tidak ada upload checkpoint dari pengguna. Token dapat diganti dengan menghapus `.local/token.txt` **saat backend berhenti**, lalu jalankan ulang.
+Backend hanya bind ke loopback. API membutuhkan bearer token, origin diizinkan terbatas dan nama file unduhan memakai allowlist hasil job. Download memakai tiket acak sekali pakai yang kedaluwarsa dalam 2 menit, dibuat oleh API terautentikasi; browser men-stream file langsung tanpa menampung seluruh WAV/ZIP di memori. Token pairing tetap tidak dimasukkan URL download. Jika download terputus, klik lagi untuk tiket baru. CORS bukan autentikasi; token tetap wajib. Token hanya ditampilkan lokal dan tidak boleh dibagikan atau dimasukkan commit. Audio tidak dikirim ke inference cloud. Log GitHub Pages tidak menerima audio, tetapi GitHub tetap melayani kunjungan website seperti biasa. Model Torch hanya dimuat dari paket/registry upstream; tidak ada upload checkpoint dari pengguna. Token dapat diganti dengan menghapus `.local/token.txt` **saat backend berhenti**, lalu jalankan ulang.
 
 ## Publikasi GitHub Pages
 

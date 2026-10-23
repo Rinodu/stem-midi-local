@@ -33,10 +33,11 @@ function button(label, action, disabled = false) {
 }
 
 async function download(path, name) {
-  const blob = await (await api(path)).blob();
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = name; a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 10000);
+  const [, jobId, kind, ...parts] = path.split('/');
+  const asset = kind === 'archive' ? 'archive' : parts.join('/');
+  const ticket = await (await api(`jobs/${jobId}/download?asset=${encodeURIComponent(asset)}`, {method:'POST'})).json();
+  // Native downloads stream large WAV/ZIP files without buffering them in browser memory.
+  const a = document.createElement('a'); a.href = BASE + ticket.url; a.download = name; a.click();
 }
 
 function field(label, input) {
@@ -104,6 +105,7 @@ async function refresh() {
   try {
     const jobs = await (await api('jobs')).json();
     if (!jobs.length) { $('jobs').textContent = 'Belum ada hasil. Upload cuplikan pertama lu.'; return; }
+    if (!$('jobs').querySelector('.job')) $('jobs').replaceChildren();
     // Keep an unchanged card intact so polling does not stop audio or reset inputs.
     const previous = new Map([...$('jobs').querySelectorAll('.job')].map(el => [el.dataset.id, el]));
     const cards = jobs.map(job => {

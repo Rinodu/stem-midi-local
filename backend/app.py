@@ -5,6 +5,7 @@ from pathlib import Path
 import secrets
 import shutil
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
 from typing import Literal
@@ -34,6 +35,7 @@ LOCK = threading.RLock()
 POOL = ThreadPoolExecutor(max_workers=1)
 ACTIVE = set()
 UPLOADING = set()
+DOWNLOADS = {}
 
 
 def folder_for(job_id):
@@ -242,6 +244,27 @@ def archive(job_id: str):
                 bundle.write(folder / asset, ("stems/" + Path(asset).name) if asset.endswith(".wav") else asset)
             bundle.writestr("job.json", json.dumps(job, indent=2, ensure_ascii=False))
         return FileResponse(target, filename="stem-midi-results.zip")
+
+
+@app.post("/api/jobs/{job_id}/download")
+def download_ticket(job_id: str, asset: str = Query(max_length=300)):
+    response = archive(job_id) if asset == "archive" else file(job_id, asset)
+    with LOCK:
+        for key, item in list(DOWNLOADS.items()):
+            if item[2] < time.monotonic():
+                del DOWNLOADS[key]
+        key = secrets.token_urlsafe(32)
+        DOWNLOADS[key] = (response.path, response.filename, time.monotonic() + 120)
+    return {"url": "/download/" + key}
+
+
+@app.get("/download/{key}")
+def stream_download(key: str):
+    with LOCK:
+        item = DOWNLOADS.pop(key, None)
+    if not item or item[2] < time.monotonic():
+        raise HTTPException(404, "Tautan unduhan kedaluwarsa. Klik download lagi.")
+    return FileResponse(item[0], filename=item[1], headers={"Referrer-Policy": "no-referrer"})
 
 
 app.mount("/", StaticFiles(directory=ROOT / "frontend", html=True), name="frontend")

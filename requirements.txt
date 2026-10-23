@@ -7,6 +7,8 @@ soundfile==0.13.1
 imageio-ffmpeg==0.6.0
 demucs==4.0.1
 transkun==2.0.1
+# 0.0.70 has no Windows wheels; keep the upstream CPython 3.10 binary build.
+ncls==0.0.68
 basic-pitch==0.4.0
 onnxruntime==1.21.1
 librosa==0.10.2.post1

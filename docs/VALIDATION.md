@@ -38,7 +38,9 @@ On the deployed `https://rinodu.github.io/stem-midi-local/` frontend, using the 
 - Created piano MIDI with Transkun (4 notes) and bass MIDI with Basic Pitch (4 notes).
 - Opened the piano roll and checked that the four piano notes were visible.
 - WAV, MIDI and ZIP downloads completed. ZIP validated with Python `zipfile`; contains all six stems and separate MIDI/CSV/JSON results. A buffered ZIP fetch initially failed in the in-app browser; downloads now use native streaming with short-lived, asset-scoped tickets.
+- Final streaming preview loaded the full 6-second piano audio (`readyState=4`, no media error), played to its end, and the final native ZIP download completed again after that change.
 - Backend restart preserved completed sample results.
+- The Windows start script used the saved external runtime path and started a healthy CUDA backend.
 
 ## Not established
 

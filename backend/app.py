@@ -247,21 +247,26 @@ def archive(job_id: str):
 
 
 @app.post("/api/jobs/{job_id}/download")
-def download_ticket(job_id: str, asset: str = Query(max_length=300)):
+def download_ticket(job_id: str, asset: str = Query(max_length=300), preview: bool = False):
+    if preview and asset not in read_job(job_id)["stems"].values():
+        raise HTTPException(400, "Preview hanya tersedia untuk stem audio")
     response = archive(job_id) if asset == "archive" else file(job_id, asset)
     with LOCK:
         for key, item in list(DOWNLOADS.items()):
             if item[2] < time.monotonic():
                 del DOWNLOADS[key]
         key = secrets.token_urlsafe(32)
-        DOWNLOADS[key] = (response.path, response.filename, time.monotonic() + 120)
+        DOWNLOADS[key] = (response.path, None if preview else response.filename,
+                          time.monotonic() + (3600 if preview else 120), preview)
     return {"url": "/download/" + key}
 
 
 @app.get("/download/{key}")
 def stream_download(key: str):
     with LOCK:
-        item = DOWNLOADS.pop(key, None)
+        item = DOWNLOADS.get(key)
+        if item and (not item[3] or item[2] < time.monotonic()):
+            del DOWNLOADS[key]
     if not item or item[2] < time.monotonic():
         raise HTTPException(404, "Tautan unduhan kedaluwarsa. Klik download lagi.")
     return FileResponse(item[0], filename=item[1], headers={"Referrer-Policy": "no-referrer"})

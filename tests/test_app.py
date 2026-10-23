@@ -89,6 +89,10 @@ def test_jobs_download_retry_and_archive(service, monkeypatch):
     assert client.get(ticket.json()['url']).status_code == 404
     assert client.post(f'/api/jobs/{job_id}/download?asset=source.wav', headers=headers).status_code == 404
     assert client.post(f'/api/jobs/{job_id}/download?asset=piano.wav').status_code == 401
+    preview = client.post(f'/api/jobs/{job_id}/download?asset=piano.wav&preview=true', headers=headers).json()['url']
+    assert client.get(preview, headers={'Range':'bytes=0-31'}).status_code == 206
+    assert len(client.get(preview, headers={'Range':'bytes=32-63'}).content) == 32
+    assert client.post(f'/api/jobs/{job_id}/download?asset=archive&preview=true', headers=headers).status_code == 400
     assert client.post(f'/api/jobs/{job_id}/midi', json={'stem':'drums'}, headers=headers).status_code == 422
     result = client.post(f'/api/jobs/{job_id}/midi', json={'stem':'piano','engine':'transkun'}, headers=headers)
     assert result.status_code == 202

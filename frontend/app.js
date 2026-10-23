@@ -1,7 +1,6 @@
 const $ = (id) => document.getElementById(id);
 const BASE = 'http://127.0.0.1:8765';
 let token = '', connected = false, polling = false;
-const audioUrls = new Map();
 const fragment = new URLSearchParams(location.hash.slice(1));
 if (fragment.has('token')) {
   $('token').value = fragment.get('token');
@@ -60,11 +59,8 @@ function renderJob(job) {
     const title = document.createElement('strong'); title.textContent = stem; row.append(title);
     const path = `jobs/${job.id}/files/${asset}`;
     const play = button('▶ Dengarkan', async () => {
-      const blob = await (await api(path)).blob();
-      const key = `${job.id}/${stem}`;
-      if (audioUrls.has(key)) URL.revokeObjectURL(audioUrls.get(key));
-      const url = URL.createObjectURL(blob); audioUrls.set(key, url);
-      const audio = document.createElement('audio'); audio.controls = true; audio.src = url;
+      const ticket = await (await api(`jobs/${job.id}/download?asset=${encodeURIComponent(asset)}&preview=true`, {method:'POST'})).json();
+      const audio = document.createElement('audio'); audio.controls = true; audio.src = BASE + ticket.url;
       audio.setAttribute('aria-label', `Preview ${stem}`); play.replaceWith(audio);
       audio.play().catch(() => {});
     });

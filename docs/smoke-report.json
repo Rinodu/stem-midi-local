@@ -1,0 +1,50 @@
+{
+  "fixture": "6-second synthetic harmonic melody, not a piano recording",
+  "device": "cuda",
+  "expected_pitches": [
+    60,
+    64,
+    67,
+    72
+  ],
+  "stems": [
+    "bass",
+    "drums",
+    "guitar",
+    "other",
+    "piano",
+    "vocals"
+  ],
+  "transcription": {
+    "clean_basic": {
+      "engine": "basic-pitch",
+      "notes": 5,
+      "pitches": [
+        60,
+        64,
+        67,
+        72,
+        79
+      ]
+    },
+    "clean_piano": {
+      "engine": "transkun",
+      "notes": 2,
+      "pitches": [
+        64,
+        67
+      ]
+    },
+    "piano": {
+      "engine": "transkun",
+      "notes": 4,
+      "pitches": [
+        60,
+        64,
+        67,
+        72
+      ]
+    }
+  },
+  "elapsed_seconds": 34.1
+}

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Stem / MIDI — Local audio workstation</title>
+  <link rel="stylesheet" href="style.css"><script type="module" src="app.js"></script>
+</head>
+<body>
+<header><a class="brand" href="./">STEM <span>/</span> MIDI</a><span class="tag">YOUR MUSIC. YOUR MACHINE.</span><span id="connection" role="status">● Backend belum terhubung</span></header>
+<main>
+  <section class="intro"><p class="eyebrow">LOCAL AUDIO WORKSTATION / 01</p><h1>Unpack the sound.<br><span>Find the notes.</span></h1><p>Pisahkan lagu menjadi stem. Ambil MIDI dari instrumen bernada.<br>Website di GitHub Pages, proses AI di PC lu.</p></section>
+  <section class="panel pairing"><div><h2>01 <span>Hubungkan PC</span></h2><p>Jalankan <strong>Start.bat</strong>, lalu gunakan tautan pairing yang terbuka. Izinkan akses jaringan lokal jika browser meminta.</p></div>
+    <form id="pair"><label>Token pairing lokal<input id="token" type="password" autocomplete="off" placeholder="Dari launcher PC lu" required></label><button>Hubungkan backend <span>↗</span></button></form>
+    <p id="pair-message" class="muted" role="status">Alamat backend: http://127.0.0.1:8765 · Token hanya disimpan selama tab terbuka.</p>
+  </section>
+  <section class="panel"><h2>02 <span>Pilih audio</span></h2>
+    <form id="upload">
+      <label class="drop" id="drop"> <span class="upload-icon">↑</span><strong>Taruh lagu di sini, atau pilih file</strong><span>MP3, WAV, FLAC, M4A, OGG, AIFF, AAC, WMA · Maks. 300 MiB</span><input type="file" id="audio" accept=".mp3,.wav,.flac,.m4a,.ogg,.aiff,.aac,.wma" required><span id="chosen">Belum ada file dipilih</span></label>
+      <div class="settings">
+        <label>Model pemisah<select id="model"><option value="six">6 stem · termasuk piano & gitar</option><option value="four">4 stem · fine-tuned ensemble</option></select></label>
+        <label>Perangkat<select id="device"><option value="cuda">GPU NVIDIA / CUDA</option><option value="cpu">CPU (lebih lambat)</option></select></label>
+        <label>Bagian audio<select id="seconds"><option value="30">Cuplikan 30 detik</option><option value="60">Cuplikan 60 detik</option><option value="0">Sampai akhir · maks. 30 menit</option></select></label>
+        <label>Mulai (detik)<input id="start" type="number" min="0" max="7200" step="0.1" value="0" required></label>
+        <label>Kualitas<select id="quality"><option value="balanced">Seimbang · 1 shift</option><option value="high">Lebih teliti · 2 shift</option></select></label>
+      </div>
+      <div class="notice">Piano pada model 6-stem masih eksperimental: suara instrumen lain bisa bocor. Mulai dengan cuplikan sebelum memproses satu lagu penuh.</div>
+      <button id="process" class="primary" disabled>Pisahkan instrumen <span>→</span></button><span id="upload-message" role="status"></span>
+    </form>
+  </section>
+  <section class="results"><div class="section-title"><h2>03 <span>Hasil di PC lu</span></h2><button id="refresh" class="secondary" disabled>↻ Muat ulang</button></div><p class="muted">Stem dan MIDI tetap tersedia setelah backend dinyalakan kembali. Satu proses AI berjalan pada satu waktu.</p><div id="jobs"><div class="empty">Hasil pemisahan akan muncul di sini setelah backend terhubung.</div></div></section>
+  <section class="fineprint"><h3>A good starting point. Not a perfect score.</h3><p>Source separation dan transkripsi polyphonic tidak 100% akurat. Akor rapat, pedal, reverb, dan distorsi bisa menghasilkan not salah atau hilang. Dengarkan stem dan periksa MIDI sebelum dipakai. Drum tersedia sebagai audio; MIDI drum tidak disediakan. Waktu MIDI dimulai dari awal cuplikan, tanpa deteksi tempo atau quantization otomatis.</p></section>
+</main>
+<dialog id="roll-dialog"><div class="section-title"><h2 id="roll-title">Piano roll</h2><button id="close-roll" class="secondary">Tutup ×</button></div><p id="roll-description" class="muted"></p><div class="roll-scroll"><canvas id="roll" role="img" aria-label="Piano roll not MIDI"></canvas></div><p class="muted">Sumbu mendatar = waktu (detik), sumbu tegak = pitch MIDI. Tampilan ini untuk pemeriksaan, belum mendukung edit not.</p></dialog>
+<footer><span>STEM / MIDI</span><a href="https://github.com/Rinodu/stem-midi-local" target="_blank" rel="noreferrer">Source & panduan ↗</a><span>NO CLOUD INFERENCE · NO API CREDITS</span></footer>
+</body></html>
